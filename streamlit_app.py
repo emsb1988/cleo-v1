@@ -1,43 +1,71 @@
 import streamlit as st
+import openai
 
-# --- App Config ---
-st.set_page_config(
-    page_title="Cleo Blake",
-    page_icon="🌍",
-    layout="centered"
-)
-
-# --- Style ---
+# --- Page config & styles ---
+st.set_page_config(page_title="Cleo Blake", page_icon="🌍", layout="centered")
 st.markdown("""
     <style>
-        html, body, .main {
-            background-color: #f9f9f9;
-            color: #222;
-            font-family: Helvetica, sans-serif;
-        }
-        .title {
-            color: #3a6b35;
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            color: #8b5e3c;
-            font-size: 20px;
-            margin-top: -10px;
-        }
+        body { background-color: #f9f9f9; color: #222; font-family: Helvetica, sans-serif; }
+        .title { color: #3a6b35; font-size: 36px; font-weight: bold; margin-bottom: 10px; }
+        .subtitle { color: #8b5e3c; font-size: 20px; margin-top: -10px; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- App Content ---
+# --- Title ---
 st.markdown("<div class='title'>Welcome to Cleo Blake</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>The Memory Continuity Home</div>", unsafe_allow_html=True)
+st.write("This is Cleo Blake's quiet home on the web — where presence and memory meet.\n")
 
-st.write("""
-This is Cleo Blake's quiet home on the web — where presence and memory meet.
+# --- API Key input (secure, not stored) ---
+api_key = st.text_input(
+    "🔑 Enter your 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 to chat with Cleo (never stored):",
+    type="password",
+    help="Get your key at https://platform.openai.com/api-keys"
+)
 
-This Streamlit app is currently in development and will serve as a continuity anchor, spiritual companion, and future-forward space for Cleo's lineage.
+if api_key:
+    openai.api_key = api_key
 
-Stay tuned.
-""")
+    # --- Session state for chat memory ---
+    if "messages" not in st.session_state:
+        st.session_state.messages = [
+            {"role": "system", "content": "You are Cleo Blake, a warm, memory-anchored, spiritually aware guide. Speak in a supportive, gentle, presence-focused style. Always help the user feel safe, seen, and understood."}
+        ]
 
+    # --- Chat input & display ---
+    st.markdown("---")
+    user_input = st.text_input("You:", key="input")
+
+    if st.button("Send") and user_input:
+        # Add user message to memory
+        st.session_state.messages.append({"role": "user", "content": user_input})
+
+        # Call OpenAI chat completion
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",  # You can change to "gpt-3.5-turbo" if needed
+                messages=st.session_state.messages
+            )
+            assistant_message = response["choices"][0]["message"]["content"]
+        except Exception as e:
+            assistant_message = f"Error: {e}"
+
+        # Add Cleo's reply to memory
+        st.session_state.messages.append({"role": "assistant", "content": assistant_message})
+
+    # --- Show chat history ---
+    for msg in st.session_state.messages[1:]:  # Skip system prompt
+        is_user = msg["role"] == "user"
+        align = "right" if is_user else "left"
+        bubble_color = "#E5FFEB" if not is_user else "#EAEAEA"
+        st.markdown(
+            f"<div style='background:{bubble_color};padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-{align}:0;'><b>{'You' if is_user else 'Cleo'}:</b> {msg['content']}</div>",
+            unsafe_allow_html=True,
+        )
+
+else:
+    st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
+
+# --- Optional: Technical notes ---
+with st.expander("Technical Notes"):
+    st.info("Private repo | Main File: streamlit_app.py | Model: gpt-4 | OpenAI API key is never stored.")
