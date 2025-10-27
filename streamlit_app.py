@@ -41,6 +41,3 @@ This Streamlit app is currently in development and will serve as a continuity an
 Stay tuned.
 """)
 
-# --- Optional Debug Info ---
-with st.expander("Technical Notes"):
-    st.info("Repo: emsb1988/cleo-v1 | Main File: streamlit_app.py | Branch: main")
