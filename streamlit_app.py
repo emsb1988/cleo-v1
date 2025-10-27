@@ -26,13 +26,15 @@ api_key = st.text_input(
 if api_key:
     openai.api_key = api_key
 
-    # --- Session state for chat memory & input ---
+    # --- Session state for chat memory ---
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "system", "content": "You are Cleo Blake, a warm, memory-anchored, spiritually aware guide. Speak in a supportive, gentle, presence-focused style. Always help the user feel safe, seen, and understood."}
         ]
     if "user_input" not in st.session_state:
         st.session_state.user_input = ""
+    if "last_input" not in st.session_state:
+        st.session_state.last_input = ""
 
     # --- Show chat history (skip system prompt) ---
     for msg in st.session_state.messages[1:]:
@@ -47,16 +49,16 @@ if api_key:
                 unsafe_allow_html=True,
             )
 
-    # --- Input box ---
-    user_input = st.text_input("Type your message and press Enter:", key="input", value=st.session_state.user_input)
+    # --- Input box (single line, no extra user box at the bottom) ---
+    user_input = st.text_input("Type your message and press Enter:", value=st.session_state.user_input, key="input")
 
     # Only process if input is non-empty AND different from last input (prevents repeat)
-    if user_input and user_input != st.session_state.get("last_input", ""):
+    if user_input and user_input != st.session_state.last_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4",  # Or "gpt-3.5-turbo" if needed
+                model="gpt-4",
                 messages=st.session_state.messages
             )
             assistant_message = response["choices"][0]["message"]["content"]
@@ -65,12 +67,11 @@ if api_key:
 
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
 
-        # Store last input, then clear input box for next message
         st.session_state.last_input = user_input
         st.session_state.user_input = ""
-        st.experimental_rerun()
+        st.rerun()
     else:
-        st.session_state.user_input = user_input  # update live
+        st.session_state.user_input = user_input  # Update input state live
 
 else:
     st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
