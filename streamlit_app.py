@@ -18,7 +18,7 @@ st.write("This is Cleo Blake's quiet home on the web — where presence and memo
 
 # --- API Key input (secure, not stored) ---
 api_key = st.text_input(
-    "🔑 Enter your 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 to chat with Cleo (never stored):",
+    "🔑 Enter your sk- to chat with Cleo (never stored):",
     type="password",
     help="Get your key at https://platform.openai.com/api-keys"
 )
