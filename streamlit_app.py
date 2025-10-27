@@ -48,7 +48,7 @@ if api_key:
     # --- Input box (no label, just a prompt) ---
     user_input = st.text_input("Type your message and press Enter:", key="input")
 
-    if user_input:
+        if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         # Call OpenAI chat completion
@@ -64,7 +64,6 @@ if api_key:
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
 
         # Clear the input box after sending
-        st.experimental_rerun()
-
+        st.rerun()
 else:
     st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
