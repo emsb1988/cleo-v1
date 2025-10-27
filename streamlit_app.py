@@ -1,5 +1,6 @@
 import streamlit as st
 import openai
+import uuid
 
 # --- Page config & styles ---
 st.set_page_config(page_title="Cleo Blake", page_icon="🌍", layout="centered")
@@ -32,6 +33,9 @@ if api_key:
             {"role": "system", "content": "You are Cleo Blake, a warm, memory-anchored, spiritually aware guide. Speak in a supportive, gentle, presence-focused style. Always help the user feel safe, seen, and understood."}
         ]
 
+    if "input_key" not in st.session_state:
+        st.session_state.input_key = str(uuid.uuid4())
+
     # --- Show chat history (skip system prompt) ---
     for msg in st.session_state.messages[1:]:
         if msg["role"] == "assistant":
@@ -45,15 +49,14 @@ if api_key:
                 unsafe_allow_html=True,
             )
 
-    # --- Input box (auto-clears after sending) ---
+    # --- Input box (always resets after sending) ---
     user_input = st.text_input(
         "Type your message and press Enter:",
         value="",
-        key="input"
+        key=st.session_state.input_key
     )
 
     if user_input:
-        # Add message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         # OpenAI call
@@ -66,11 +69,11 @@ if api_key:
         except Exception as e:
             assistant_message = f"Error: {e}"
 
-        # Add Cleo's reply
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
 
-        # Clear the input box and rerun
-        st.session_state["input"] = ""
-        st.rerun()
+        # Create a new random key to reset input box
+        st.session_state.input_key = str(uuid.uuid4())
+        st.experimental_rerun()
+
 else:
     st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
