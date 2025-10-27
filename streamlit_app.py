@@ -32,12 +32,23 @@ if api_key:
             {"role": "system", "content": "You are Cleo Blake, a warm, memory-anchored, spiritually aware guide. Speak in a supportive, gentle, presence-focused style. Always help the user feel safe, seen, and understood."}
         ]
 
-    # --- Chat input & display ---
-    st.markdown("---")
-    user_input = st.text_input("You:", key="input")
+    # --- Show chat history (skip system prompt) ---
+    for msg in st.session_state.messages[1:]:
+        if msg["role"] == "assistant":
+            st.markdown(
+                f"<div style='background:#E5FFEB;padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-left:0;'><b>Cleo:</b> {msg['content']}</div>",
+                unsafe_allow_html=True,
+            )
+        elif msg["role"] == "user":
+            st.markdown(
+                f"<div style='background:#EAEAEA;padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-right:0;text-align:right;'>{msg['content']}</div>",
+                unsafe_allow_html=True,
+            )
 
-    if st.button("Send") and user_input:
-        # Add user message to memory
+    # --- Input box (no label, just a prompt) ---
+    user_input = st.text_input("Type your message and press Enter:", key="input")
+
+    if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         # Call OpenAI chat completion
@@ -50,19 +61,10 @@ if api_key:
         except Exception as e:
             assistant_message = f"Error: {e}"
 
-        # Add Cleo's reply to memory
         st.session_state.messages.append({"role": "assistant", "content": assistant_message})
 
-    # --- Show chat history ---
-    for msg in st.session_state.messages[1:]:  # Skip system prompt
-        is_user = msg["role"] == "user"
-        align = "right" if is_user else "left"
-        bubble_color = "#E5FFEB" if not is_user else "#EAEAEA"
-        st.markdown(
-            f"<div style='background:{bubble_color};padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-{align}:0;'><b>{'You' if is_user else 'Cleo'}:</b> {msg['content']}</div>",
-            unsafe_allow_html=True,
-        )
+        # Clear the input box after sending
+        st.experimental_rerun()
 
 else:
     st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
-
