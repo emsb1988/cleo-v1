@@ -18,7 +18,7 @@ st.write("This is Cleo Blake's quiet home on the web — where presence and memo
 
 # --- API Key input (secure, not stored) ---
 api_key = st.text_input(
-    "🔑 Enter your sk- to chat with Cleo (never stored):",
+    "🔑 Enter your **OpenAI API Key** to chat with Cleo (never stored):",
     type="password",
     help="Get your key at https://platform.openai.com/api-keys"
 )
