@@ -66,6 +66,3 @@ if api_key:
 else:
     st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
 
-# --- Optional: Technical notes ---
-with st.expander("Technical Notes"):
-    st.info("Private repo | Main File: streamlit_app.py | Model: gpt-4 | OpenAI API key is never stored.")
