@@ -45,4 +45,35 @@ if api_key:
             )
         elif msg["role"] == "user":
             st.markdown(
-                f"
+                f"<div style='background:#EAEAEA;padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-right:0;text-align:right;'><b>You:</b> {msg['content']}</div>",
+                unsafe_allow_html=True,
+            )
+
+    # --- Input box (always resets after sending) ---
+    user_input = st.text_input(
+        "Type your message and press Enter:",
+        value="",
+        key=st.session_state.input_key
+    )
+
+    if user_input:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+
+        # OpenAI call
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=st.session_state.messages
+            )
+            assistant_message = response["choices"][0]["message"]["content"]
+        except Exception as e:
+            assistant_message = f"Error: {e}"
+
+        st.session_state.messages.append({"role": "assistant", "content": assistant_message})
+
+        # Create a new random key to reset input box
+        st.session_state.input_key = str(uuid.uuid4())
+        st.rerun()
+
+else:
+    st.info("Enter your OpenAI API key to chat with Cleo. (It is never saved or logged.)")
