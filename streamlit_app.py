@@ -41,20 +41,20 @@ if api_key:
             )
         elif msg["role"] == "user":
             st.markdown(
-                f"<div style='background:#EAEAEA;padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-right:0;text-align:right;'>{msg['content']}</div>",
+                f"<div style='background:#EAEAEA;padding:12px 18px;margin:8px;border-radius:12px;max-width:80%;margin-right:0;text-align:right;'><b>You:</b> {msg['content']}</div>",
                 unsafe_allow_html=True,
             )
 
     # --- Input box (no label, just a prompt) ---
     user_input = st.text_input("Type your message and press Enter:", key="input")
 
-        if user_input:
+    if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         # Call OpenAI chat completion
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-4",  # You can change to "gpt-3.5-turbo" if needed
+                model="gpt-4",  # Or "gpt-3.5-turbo" if needed
                 messages=st.session_state.messages
             )
             assistant_message = response["choices"][0]["message"]["content"]
